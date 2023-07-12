@@ -3,7 +3,6 @@
 # !!! case 's' finish
 # !!! update Task setter, add more fields
 # !!! check for name validity in edit option
-# !!! JSON file dumping check validity
 
 # 1. Parse JSON file into simple list of Task elements
 # 2. Endless loop for user to enter commands via match-case
@@ -35,10 +34,12 @@ class Task:
 
     def get_task(self, mode):     # getter
         if mode == "JSON":
-            return [
-                self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
-                self.isRunning
-            ]
+            return {
+                self.name: [
+                    self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
+                    self.isRunning
+                ]
+            }
         elif mode == "USER":
             return {
                 "Task name": self.name,
@@ -130,7 +131,7 @@ while True:
                     continue  # if not valid integer we skip this iteration of the loop
                 if taskNumber - 1 in range(len(taskList)):  # if selected task is present in taskList
                     print("Please enter new name for selected task:")
-                    taskList[taskNumber].set_task(input())  # should check for name validity !!!
+                    taskList[taskNumber - 1].set_task(input())  # should check for name validity !!!
                 else:
                     print("Please input a valid task index.")
             else:
@@ -140,8 +141,11 @@ while True:
             print("WORK IN PROGRESS!")
         # 9. Exit and save tasks
         case 'q':   # finishing program and printing result to JSON file
-            with open("tasks.json", 'w') as file:
-                json.dump(taskList, file, indent=4)     # finish file dumping, wont work now !!!
+            with open("tasks.json", 'w') as file:   # open file
+                dumpDict = {}                       # the result dict
+                for task in taskList:               # pick every task we have
+                    dumpDict.update(task.get_task("JSON"))  # placing them all in the result dict
+                json.dump(dumpDict, file, indent=4)         # finally, saving file, ending program
             print("Goodbye.")
             break
         case _:
