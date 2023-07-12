@@ -1,7 +1,6 @@
 # !!! Task start_task might not be necessary
 # !!! Task end_task might not be necessary
 # !!! case 's' finish
-# !!! try block in case 'r' might not be necessary
 
 
 from datetime import datetime
@@ -22,8 +21,9 @@ class Task:
     def get_task(self, mode="ALL"):       # getter
         if mode == "ALL":
             return self.name, self.startTime
-        elif mode == "ALL_WITHOUT_NAME":
-            return self.startTime
+        elif mode == "JSON":
+            return [self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
+                    self.isRunning]
         elif mode == "NAME":
             return self.name
         elif mode == "START_TIME":
@@ -55,7 +55,7 @@ while True:
             if len(text) > 0:           # task name length should be > 0
                 if text not in taskDict.keys():     # check if task already exists in taskDict
                     task = Task(text)  # creating new instance of Task class
-                    taskDict[task.get_task("NAME")] = task.get_task("ALL_WITHOUT_NAME")     # adding to list
+                    taskDict[task.get_task("NAME")] = task.get_task("JSON")     # adding to list
                 else:
                     print("Task with this name is already present in registered tasks.")
             else:
@@ -69,13 +69,13 @@ while True:
                 print("There are no tasks registered.")
         case 'r':   # remove task
             if len(taskDict) > 0:   # if there are any tasks
-                print("Pick task number you want to remove:")
+                print("Select task number you want to remove:")
                 taskList = []   # here we will save task names to delete them via index, not names
                 for index, taskName in enumerate(taskDict):     # print formatted list with indexes
                     print(index, taskName)
                     taskList.append(taskName)
                 taskNumber = input()
-                try:    # check for correct input from user !!!
+                try:    # check for correct input from user
                     taskNumber = int(taskNumber)
                 except ValueError:  # if input is incorrect
                     print("Please input an integer.")
@@ -87,10 +87,11 @@ while True:
             else:
                 print("No tasks registered.")
         case 's':   # start task processing !!!
-            print("WORK IN PROGRESS!")
+            print("Select task number you want to start:")
+
         case 'e':
             with open("tasks.json", 'w') as file:
-                json.dump(taskDict, file, indent=2)
+                json.dump(taskDict, file, indent=4)
             print("Goodbye.")
             break
         case _:
