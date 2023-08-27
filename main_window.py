@@ -2,6 +2,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from task_table_model import TaskTableModel
+from task_list_model import TaskListModel
 import json
 
 
@@ -14,7 +15,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         # init JSON handling structure
         self.json_model = QStandardItemModel()
-        self.table_model = TaskTableModel()
+        self._table_model = TaskTableModel()
+        self._list_model = TaskListModel()
         # load UI file
         loadUi("main.ui", self)
         self.init_window()
@@ -23,12 +25,13 @@ class MainWindow(QMainWindow):
         # create JSON model for input file
         self.open_json_file()
         # use tree element created from UI
-        # self.tree_view.setModel(self.json_model)
-        self.table_view.setModel(self.table_model)
+        self.table_view.setModel(self._table_model)
+        self.list_view.setModel(self._list_model)
         self.save_file.clicked.connect(lambda: self.save_json_file(self.json_model))
-        self.add_task.clicked.connect(lambda: self.on_add_task(self.json_model))
+        self.add_task.clicked.connect(self.on_add_task)
         self.delete_task.clicked.connect(lambda: self.on_delete_task(self.json_model))
         self.modify_task.clicked.connect(lambda: self.on_modify_task(self.json_model))
+        self.list_view.doubleClicked.connect(lambda: self.on_element_double_click(self._list_model))
 
     # opening file and extracting data
     def open_json_file(self):
@@ -75,7 +78,9 @@ class MainWindow(QMainWindow):
             return parent_item.text()
 
     # add task button function
-    def on_add_task(self, parent_item):
+    def on_add_task(self):
+        rows = self._list_model.rowCount(self.list_view)
+        self._list_model.insertRows(rows, 1)
         print("added task")
         pass
 
@@ -88,3 +93,6 @@ class MainWindow(QMainWindow):
     def on_modify_task(self, parent_item):
         print("modified task")
         pass
+
+    def on_element_double_click(self, parent_item):
+        print("double_clicked")
