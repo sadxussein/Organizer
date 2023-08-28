@@ -1,6 +1,7 @@
+from PyQt5.QtCore import QDir
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QWidget
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFileSystemModel
 from task_table_model import TaskTableModel
 from task_list_model import TaskListModel
 import json
@@ -15,23 +16,26 @@ class MainWindow(QMainWindow):
         super().__init__()
         # init JSON handling structure
         self.json_model = QStandardItemModel()
-        self._table_model = TaskTableModel()
+        # self._table_model = TaskTableModel()
         self._list_model = TaskListModel()
-        # load UI file
+        self._file_model = QFileSystemModel()
+        self._file_model.setRootPath(QDir.currentPath())
+        # TODO: consider removing loading UI file
         loadUi("main.ui", self)
         self.init_window()
 
     def init_window(self):
         # create JSON model for input file
-        self.open_json_file()
+        # self.open_json_file()
         # use tree element created from UI
-        self.table_view.setModel(self._table_model)
+        # self.table_view.setModel(self._table_model)
         self.list_view.setModel(self._list_model)
-        self.save_file.clicked.connect(lambda: self.save_json_file(self.json_model))
+        # self.list_view.setRootIndex(self._file_model.index(QDir.currentPath()))
+        # self.save_file.clicked.connect(lambda: self.save_json_file(self.json_model))
         self.add_task.clicked.connect(self.on_add_task)
-        self.delete_task.clicked.connect(lambda: self.on_delete_task(self.json_model))
-        self.modify_task.clicked.connect(lambda: self.on_modify_task(self.json_model))
-        self.list_view.doubleClicked.connect(lambda: self.on_element_double_click(self._list_model))
+        # self.delete_task.clicked.connect(self.on_delete_task)
+        # self.modify_task.clicked.connect(lambda: self.on_modify_task(self.json_model))
+        # self.list_view.doubleClicked.connect(lambda: self.on_element_double_click(self._list_model))
 
     # opening file and extracting data
     def open_json_file(self):
@@ -86,6 +90,8 @@ class MainWindow(QMainWindow):
 
     # delete task button function
     def on_delete_task(self, parent_item):
+        rows = self._list_model.rowCount(self.list_view)
+        self._list_model.removeRows(rows, 1)
         print("deleted task")
         pass
 

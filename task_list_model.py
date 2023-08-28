@@ -1,6 +1,6 @@
 import typing
 
-from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt
+from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, QVariant
 
 
 class TaskListModel(QAbstractListModel):
@@ -14,11 +14,13 @@ class TaskListModel(QAbstractListModel):
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         if not index.isValid():
-            return None
+            return QVariant()
 
-        row = index.row()
-        if role == Qt.DisplayRole:
-            return self._data[row]
+        if role == Qt.DisplayRole or role == Qt.EditRole:
+            # print("role == Qt.DisplayRole or role == Qt.EditRole")
+            return self._data[index.row()]
+
+        return QVariant()
 
     # TODO: is it really necessary?
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
@@ -29,18 +31,26 @@ class TaskListModel(QAbstractListModel):
         if self._prepared_data is not None:
             self._data.insert(row, self._prepared_data)
         self.endInsertRows()
-        # self.dataChanged.emit(self.index(row, 0), self.index(row + count - 1, 0))
         return True
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
         self.beginRemoveRows(QModelIndex(), row, row + count - 1)
         del self._data[row]
-        self.endInsertRows()
+        self.endRemoveRows()
         return True
 
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
+        if index.isValid() and role == Qt.EditRole:
+            self._data[index.row()] = value
+            self.dataChanged.emit(index, index)
+            print("TRUE")
+            return True
+        print("FALSE")
+        return False
 
-        return True
+    # TODO: necessary?
+    # def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+    #     return Qt.ItemIsEditable
 
     def prepare_data(self, prepared_data):
         self._prepared_data = prepared_data
