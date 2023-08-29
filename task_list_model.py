@@ -26,7 +26,7 @@ class TaskListModel(QAbstractListModel):
         elif role == Qt.EditRole:
             return self._data[index.row()]
 
-        return None
+        return QVariant()
 
     # editing data
     def setData(self, index: QModelIndex, value: typing.Any, role: int = ...) -> bool:
@@ -63,5 +63,6 @@ class TaskListModel(QAbstractListModel):
         self.endRemoveRows()
         return True
 
+    # drag'n'drop flags
     def supportedDragActions(self) -> Qt.DropActions:
         return Qt.CopyAction | Qt.MoveAction

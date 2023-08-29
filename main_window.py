@@ -1,10 +1,7 @@
-from PyQt5.QtCore import QDir
-from PyQt5.uic import loadUi
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFileSystemModel, QAbstractItemView, QListView, QPushButton, \
-    QVBoxLayout
-from task_table_model import TaskTableModel
+from PyQt5.QtGui import QStandardItem
+from PyQt5.QtWidgets import QMainWindow, QWidget, QAbstractItemView, QListView, QPushButton, QVBoxLayout
 from task_list_model import TaskListModel
+from task_list_delegate import TaskListDelegate
 import json
 
 
@@ -15,53 +12,46 @@ import json
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
+        # main elements of the window
         self.central_widget = QWidget(self)
-        self.list_view = QListView()
-        self.add_task = QPushButton("Add task")
-        self.delete_task = QPushButton("Delete task")
+        self.task_list_view = QListView()
+        self.task_view = QListView()
+        self.add_task_button = QPushButton("Add task")
+        self.delete_task_button = QPushButton("Delete task")
+        self.save_tasks_button = QPushButton("Save tasks")
         self.layout = QVBoxLayout()
-
-        # init JSON handling structure
-        self.json_model = QStandardItemModel()
-        # self._table_model = TaskTableModel()
-        # temp line, just to test TaskListModel constructor
+        # models
         self._initial_data = ["Eat", "Sleep", "Fuck", "Repeat"]
-        self._list_model = TaskListModel(self._initial_data)
-        # self._file_model = QFileSystemModel()
-        # self._file_model.setRootPath(QDir.currentPath())
-
-        # TODO: consider removing loading UI file
-        # loadUi("main.ui", self)
+        self._task_list_model = TaskListModel(self._initial_data)
+        self._task_list_selection_model = self.task_list_view.selectionModel()  # TODO: duplicated
+        # delegates
+        self._task_list_delegate = TaskListDelegate()
+        # initializing main elements of the window
         self.init_window()
 
     # setting up window's elements properties
     def init_window(self):
-        # create JSON model for input file
-        # self.open_json_file()
-        # use tree element created from UI
-        # self.table_view.setModel(self._table_model)
-
         self.setCentralWidget(self.central_widget)
 
-        self.list_view.setModel(self._list_model)
-        self.list_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.list_view.setDragEnabled(True)
-        self.list_view.viewport().setAcceptDrops(True)
-        self.list_view.setDropIndicatorShown(True)
+        self.task_list_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.task_list_view.setDragEnabled(True)
+        self.task_list_view.viewport().setAcceptDrops(True)
+        self.task_list_view.setDropIndicatorShown(True)
+        self.task_list_view.setModel(self._task_list_model)
+        self.task_list_view.setItemDelegate(self._task_list_delegate)
 
-        # self.list_view.setRootIndex(self._file_model.index(QDir.currentPath()))
-        # self.save_file.clicked.connect(lambda: self.save_json_file(self.json_model))
+        self._task_list_selection_model = self.task_list_view.selectionModel()
+        self._task_list_selection_model.selectionChanged.connect(self.on_selection_changed)
 
-        self.add_task.clicked.connect(self.on_add_task)
-        self.delete_task.clicked.connect(self.on_delete_task)
+        self.add_task_button.clicked.connect(self.on_add_task)
+        self.delete_task_button.clicked.connect(self.on_delete_task)
+        self.save_tasks_button.clicked.connect(self.save_json_file)
 
-        # self.modify_task.clicked.connect(lambda: self.on_modify_task(self.json_model))
-        # self.list_view.doubleClicked.connect(lambda: self.on_element_double_click(self._list_model))
-
-        self.layout.addWidget(self.list_view)
-        self.layout.addWidget(self.add_task)
-        self.layout.addWidget(self.delete_task)
+        self.layout.addWidget(self.task_list_view)
+        self.layout.addWidget(self.task_view)
+        self.layout.addWidget(self.add_task_button)
+        self.layout.addWidget(self.delete_task_button)
+        self.layout.addWidget(self.save_tasks_button)
 
         self.central_widget.setLayout(self.layout)
 
@@ -111,20 +101,20 @@ class MainWindow(QMainWindow):
 
     # add task button function
     def on_add_task(self):
-        rows = self._list_model.rowCount(self.list_view)
-        self._list_model.insertRows(rows, 1)
-        pass
+        rows = self._task_list_model.rowCount(self._task_list_model)
+        self._task_list_model.insertRows(rows, 1)
 
     # delete task button function
     def on_delete_task(self):
-        rows = self._list_model.rowCount(self.list_view)
-        self._list_model.removeRows(rows, 1)
-        pass
+        # TODO: rewrite for usage of _task_list_selection_model
+        selection_model = self.task_list_view.selectionModel()
+        selected_indexes = selection_model.selectedIndexes()
+        # in case if in the future task list view will support multi-selection
+        for index in selected_indexes:
+            self._task_list_model.removeRows(index.row(), 1)
 
-    # modify task button function
-    def on_modify_task(self, parent_item):
-        print("modified task")
-        pass
-
-    def on_element_double_click(self, parent_item):
-        print("double_clicked")
+    def on_selection_changed(self):
+        selection_model = self.task_list_view.selectionModel()
+        selected_indexes = selection_model.selectedIndexes()
+        for index in selected_indexes:
+            print(f"Selected item under index {index.row()}")
