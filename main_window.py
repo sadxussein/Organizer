@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QDir
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFileSystemModel
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFileSystemModel, QAbstractItemView, QListView, QPushButton, \
+    QVBoxLayout
 from task_table_model import TaskTableModel
 from task_list_model import TaskListModel
 import json
@@ -14,28 +15,55 @@ import json
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.central_widget = QWidget(self)
+        self.list_view = QListView()
+        self.add_task = QPushButton("Add task")
+        self.delete_task = QPushButton("Delete task")
+        self.layout = QVBoxLayout()
+
         # init JSON handling structure
         self.json_model = QStandardItemModel()
         # self._table_model = TaskTableModel()
-        self._list_model = TaskListModel()
-        self._file_model = QFileSystemModel()
-        self._file_model.setRootPath(QDir.currentPath())
+        # temp line, just to test TaskListModel constructor
+        self._initial_data = ["Eat", "Sleep", "Fuck", "Repeat"]
+        self._list_model = TaskListModel(self._initial_data)
+        # self._file_model = QFileSystemModel()
+        # self._file_model.setRootPath(QDir.currentPath())
+
         # TODO: consider removing loading UI file
-        loadUi("main.ui", self)
+        # loadUi("main.ui", self)
         self.init_window()
 
+    # setting up window's elements properties
     def init_window(self):
         # create JSON model for input file
         # self.open_json_file()
         # use tree element created from UI
         # self.table_view.setModel(self._table_model)
+
+        self.setCentralWidget(self.central_widget)
+
         self.list_view.setModel(self._list_model)
+        self.list_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.list_view.setDragEnabled(True)
+        self.list_view.viewport().setAcceptDrops(True)
+        self.list_view.setDropIndicatorShown(True)
+
         # self.list_view.setRootIndex(self._file_model.index(QDir.currentPath()))
         # self.save_file.clicked.connect(lambda: self.save_json_file(self.json_model))
+
         self.add_task.clicked.connect(self.on_add_task)
-        # self.delete_task.clicked.connect(self.on_delete_task)
+        self.delete_task.clicked.connect(self.on_delete_task)
+
         # self.modify_task.clicked.connect(lambda: self.on_modify_task(self.json_model))
         # self.list_view.doubleClicked.connect(lambda: self.on_element_double_click(self._list_model))
+
+        self.layout.addWidget(self.list_view)
+        self.layout.addWidget(self.add_task)
+        self.layout.addWidget(self.delete_task)
+
+        self.central_widget.setLayout(self.layout)
 
     # opening file and extracting data
     def open_json_file(self):
@@ -85,14 +113,12 @@ class MainWindow(QMainWindow):
     def on_add_task(self):
         rows = self._list_model.rowCount(self.list_view)
         self._list_model.insertRows(rows, 1)
-        print("added task")
         pass
 
     # delete task button function
-    def on_delete_task(self, parent_item):
+    def on_delete_task(self):
         rows = self._list_model.rowCount(self.list_view)
         self._list_model.removeRows(rows, 1)
-        print("deleted task")
         pass
 
     # modify task button function
