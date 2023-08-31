@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>651</width>
-    <height>622</height>
+    <width>631</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,18 +17,18 @@
    <widget class="QCalendarWidget" name="calendar">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>300</y>
-      <width>291</width>
-      <height>221</height>
+      <x>320</x>
+      <y>380</y>
+      <width>300</width>
+      <height>240</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="open_file">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>530</y>
+      <x>320</x>
+      <y>320</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QPushButton" name="save_file">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>530</y>
+      <x>400</x>
+      <y>320</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QPushButton" name="add_task">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>560</y>
+      <x>320</x>
+      <y>350</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -66,8 +66,8 @@
    <widget class="QPushButton" name="delete_task">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>560</y>
+      <x>400</x>
+      <y>350</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -79,8 +79,8 @@
    <widget class="QPushButton" name="modify_task">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>560</y>
+      <x>480</x>
+      <y>350</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -93,9 +93,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
-      <width>331</width>
-      <height>281</height>
+      <y>320</y>
+      <width>300</width>
+      <height>300</height>
      </rect>
     </property>
    </widget>
@@ -104,18 +104,18 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>331</width>
-      <height>281</height>
+      <width>300</width>
+      <height>300</height>
      </rect>
     </property>
    </widget>
    <widget class="QGraphicsView" name="graphics_view">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>320</x>
       <y>10</y>
-      <width>291</width>
-      <height>281</height>
+      <width>300</width>
+      <height>300</height>
      </rect>
     </property>
    </widget>
@@ -125,8 +125,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>651</width>
-     <height>22</height>
+     <width>631</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>

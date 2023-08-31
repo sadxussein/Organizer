@@ -1,8 +1,11 @@
-from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QWidget, QAbstractItemView, QListView, QPushButton, QVBoxLayout
-from task_list_model import TaskListModel
-from task_list_delegate import TaskListDelegate
 import json
+
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QMainWindow, QWidget, QAbstractItemView, QListView, QPushButton, QVBoxLayout, QTableView
+
+from task_list_model import TaskListModel
+from task_view_model import TaskViewModel
+from task_list_delegate import TaskListDelegate
 
 
 # TODO: create new task form
@@ -15,7 +18,7 @@ class MainWindow(QMainWindow):
         # main elements of the window
         self.central_widget = QWidget(self)
         self.task_list_view = QListView()
-        self.task_view = QListView()
+        self.task_view = QTableView()
         self.add_task_button = QPushButton("Add task")
         self.delete_task_button = QPushButton("Delete task")
         self.save_tasks_button = QPushButton("Save tasks")
@@ -23,7 +26,7 @@ class MainWindow(QMainWindow):
         # models
         self._initial_data = ["Eat", "Sleep", "Fuck", "Repeat"]
         self._task_list_model = TaskListModel(self._initial_data)
-        self._task_list_selection_model = self.task_list_view.selectionModel()  # TODO: duplicated
+        self._task_view_model = QStandardItemModel(4, 2, self.task_view)
         # delegates
         self._task_list_delegate = TaskListDelegate()
         # initializing main elements of the window
@@ -31,29 +34,34 @@ class MainWindow(QMainWindow):
 
     # setting up window's elements properties
     def init_window(self):
+        # widget to which other elements are attached to
         self.setCentralWidget(self.central_widget)
-
+        # all tasks in a list
         self.task_list_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.task_list_view.setDragEnabled(True)
         self.task_list_view.viewport().setAcceptDrops(True)
         self.task_list_view.setDropIndicatorShown(True)
         self.task_list_view.setModel(self._task_list_model)
         self.task_list_view.setItemDelegate(self._task_list_delegate)
-
-        self._task_list_selection_model = self.task_list_view.selectionModel()
-        self._task_list_selection_model.selectionChanged.connect(self.on_selection_changed)
-
+        # task detailed view
+        self.task_view.horizontalHeader().setVisible(False)
+        self.task_view.verticalHeader().setVisible(False)
+        # self.task_view.
+        self.task_view.setModel(self._task_view_model)
+        # buttons, names are self explanatory
         self.add_task_button.clicked.connect(self.on_add_task)
         self.delete_task_button.clicked.connect(self.on_delete_task)
         self.save_tasks_button.clicked.connect(self.save_json_file)
-
+        # adding elements to layout
         self.layout.addWidget(self.task_list_view)
         self.layout.addWidget(self.task_view)
         self.layout.addWidget(self.add_task_button)
         self.layout.addWidget(self.delete_task_button)
         self.layout.addWidget(self.save_tasks_button)
-
+        # applying layout to central widget
         self.central_widget.setLayout(self.layout)
+        # window size
+        self.setGeometry(200, 200, 600, 600)
 
     # opening file and extracting data
     def open_json_file(self):
@@ -113,6 +121,7 @@ class MainWindow(QMainWindow):
         for index in selected_indexes:
             self._task_list_model.removeRows(index.row(), 1)
 
+    # updating index of selected task
     def on_selection_changed(self):
         selection_model = self.task_list_view.selectionModel()
         selected_indexes = selection_model.selectedIndexes()

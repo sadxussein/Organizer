@@ -20,6 +20,11 @@ from main_window import MainWindow
 # 9. Finish tracking task
 # 10. Exit and save tasks
 
+# GUI
+# TODO: detailed task view
+# TODO: task groups, task tags
+
+
 if __name__ == "__main__":
     # !!!
     app = QApplication(sys.argv)
