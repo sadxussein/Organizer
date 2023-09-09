@@ -8,7 +8,7 @@ class TaskListModel(QAbstractListModel):
     def __init__(self, data=None):
         QAbstractListModel.__init__(self)
         # if data is None replace it with empty list, to safe myself from unnecessary checks
-        self._data = data or []
+        self._data = [task.get_task("NAME") for task in data] or []
 
     # implementing from parent class
     def rowCount(self, parent: QModelIndex = ...) -> int:
@@ -43,9 +43,9 @@ class TaskListModel(QAbstractListModel):
     # setting flags for data in model and view to become editable
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         if not index.isValid():
-            return Qt.ItemIsEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsDropEnabled
 
-        return super().flags(index) | Qt.ItemIsEditable
+        return super().flags(index) | Qt.ItemIsEditable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
 
     # adding empty task to model
     def insertRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
@@ -64,5 +64,8 @@ class TaskListModel(QAbstractListModel):
         return True
 
     # drag'n'drop flags
-    def supportedDragActions(self) -> Qt.DropActions:
+    # def supportedDragActions(self) -> Qt.DropActions:
+    #     return Qt.CopyAction | Qt.MoveAction
+
+    def supportedDropActions(self) -> Qt.DropActions:
         return Qt.CopyAction | Qt.MoveAction

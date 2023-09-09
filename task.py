@@ -4,7 +4,7 @@ from datetime import datetime
 # Task class
 # 1. All types of constructors
 # 2. Setter
-# !!! update Task setter, add more fields
+# TODO: update Task setter, add more fields
 # 3. Getter
 # 4. Start task
 # 5. End task
@@ -50,7 +50,7 @@ class Task:
             self.timeRanges = []
 
     # 2. Setter
-    def set_task(self, name):   # setter !!!
+    def set_task(self, name):   # TODO: setter
         self.name = name
 
     # 3. Getter
@@ -61,37 +61,29 @@ class Task:
                 time_ranges_json = []
                 for timeRange in self.timeRanges:
                     time_ranges_json.append(tuple(time.strftime("%Y-%m-%d %H:%M:%S") for time in timeRange))
-                return {
-                    self.name: [
+                return [
                         self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
                         self.isRunning,
                         self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
                         self.endTime.strftime("%Y-%m-%d %H:%M:%S"),
                         time_ranges_json
                     ]
-                }
             elif self.startTime is not None:
-                return {
-                    self.name: [
+                return [
                         self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
                         self.isRunning,
-                        self.startTime.strftime("%Y-%m-%d %H:%M:%S")
+                        self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
+                        "",
+                        ""
                     ]
-                }
             else:
-                return {
-                    self.name: [
+                return [
                         self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
-                        self.isRunning
+                        self.isRunning,
+                        "",
+                        "",
+                        ""
                     ]
-                }
-        # Print some info for user
-        elif mode == "USER":
-            return {
-                "Task name": self.name,
-                "Register time": self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
-                "Currently running": self.isRunning
-            }
         # Task name caller
         elif mode == "NAME":
             return self.name

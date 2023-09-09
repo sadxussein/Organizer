@@ -23,10 +23,10 @@ from main_window import MainWindow
 # GUI
 # TODO: detailed task view
 # TODO: task groups, task tags
+# TODO: jobs (task - onetime, job - repeated)
 
 
 if __name__ == "__main__":
-    # !!!
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
