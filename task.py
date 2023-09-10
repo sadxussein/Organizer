@@ -8,6 +8,8 @@ from datetime import datetime
 # 3. Getter
 # 4. Start task
 # 5. End task
+# TODO: add task timer limit
+# TODO: add pomodoro settings, 5-minute breaks and stuff
 
 class Task:
     # 1. All types of constructors
@@ -49,14 +51,10 @@ class Task:
             self.endTime = None
             self.timeRanges = []
 
-    # 2. Setter
-    def set_task(self, name):   # TODO: setter
-        self.name = name
-
     # 3. Getter
-    def get_task(self, mode):
+    def get_task(self, mode):   # TODO: rewrite getter, remove modes
         # Parse program data for JSON output in analogy with constructors
-        if mode == "JSON":
+        if mode == "USER":
             if any(self.timeRanges) and self.endTime is not None:
                 time_ranges_json = []
                 for timeRange in self.timeRanges:
@@ -87,9 +85,47 @@ class Task:
         # Task name caller
         elif mode == "NAME":
             return self.name
-        # Task status caller
-        elif mode == "RUNNING":
-            return self.isRunning
+
+    def is_task_running(self):
+        return True if self.isRunning else False
+
+    def get_task_name(self):
+        return self.name
+
+    def set_task_name(self, name):   # TODO: setter
+        self.name = name
+
+    def prepare_task_for_json_export(self):
+        if any(self.timeRanges) and self.endTime is not None:
+            time_ranges_json = []
+            for timeRange in self.timeRanges:
+                time_ranges_json.append([time.strftime("%Y-%m-%d %H:%M:%S") for time in timeRange])
+            return {
+                "name": self.name,
+                "registerTime": self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "isRunning": self.isRunning,
+                "startTime": self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "endTime": self.endTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "timeRanges": time_ranges_json
+            }
+        elif self.startTime is not None:
+            return {
+                "name": self.name,
+                "registerTime": self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "isRunning": self.isRunning,
+                "startTime": self.startTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "endTime": None,
+                "timeRanges": None
+            }
+        else:
+            return {
+                "name": self.name,
+                "registerTime": self.registerTime.strftime("%Y-%m-%d %H:%M:%S"),
+                "isRunning": self.isRunning,
+                "startTime": None,
+                "endTime": None,
+                "timeRanges": None
+            }
 
     # 4. Start task
     def start_task(self):
@@ -98,6 +134,7 @@ class Task:
 
     # 5. End task
     def end_task(self):
-        self.endTime = datetime.now()
-        self.isRunning = False
-        self.timeRanges.append((self.startTime, self.endTime))
+        if self.isRunning:
+            self.endTime = datetime.now()
+            self.isRunning = False
+            self.timeRanges.append((self.startTime, self.endTime))

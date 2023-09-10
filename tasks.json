@@ -1,36 +1,116 @@
 [
-  {
-    "name": "Eat",
-    "isRunning": false,
-    "registerTime": "2023-07-13 00:53:43",
-    "startTime": "2023-07-13 12:16:17",
-    "endTime": "2023-07-13 12:16:25",
-    "timeRanges": [
-      ["2023-07-13 11:19:24", "2023-07-13 11:19:27"],
-      ["2023-07-13 11:19:40", "2023-07-13 11:19:43"],
-      ["2023-07-13 11:30:59", "2023-07-13 11:31:15"],
-      ["2023-07-13 12:16:17", "2023-07-13 12:16:25"]
-    ]
-  },
-  {
-    "name": "Sleep",
-    "isRunning": false,
-    "registerTime": "2023-07-13 00:56:49",
-    "startTime": "2023-07-13 11:31:07",
-    "endTime": "2023-07-13 11:31:18",
-    "timeRanges": [
-      ["2023-07-13 10:08:25", "2023-07-13 11:15:11"],
-      ["2023-07-13 11:31:07", "2023-07-13 11:31:18"]
-    ]
-  },
-  {
-    "name": "Work",
-    "isRunning": false,
-    "registerTime": "2023-07-13 00:56:56",
-    "startTime": "2023-07-13 11:31:10",
-    "endTime": "2023-07-13 11:31:21",
-    "timeRanges": [
-      ["2023-07-13 11:31:10", "2023-07-13 11:31:21"]
-    ]
-  }
+    {
+        "name": "python",
+        "registerTime": "2023-09-10 17:08:15",
+        "isRunning": false,
+        "startTime": "2023-09-10 17:08:50",
+        "endTime": "2023-09-10 17:08:53",
+        "timeRanges": [
+            [
+                "2023-09-10 17:08:50",
+                "2023-09-10 17:08:53"
+            ]
+        ]
+    },
+    {
+        "name": "c/c++/unreal",
+        "registerTime": "2023-09-10 17:08:15",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "work",
+        "registerTime": "2023-09-10 17:08:15",
+        "isRunning": false,
+        "startTime": "2023-09-10 19:22:06",
+        "endTime": "2023-09-10 19:22:12",
+        "timeRanges": [
+            [
+                "2023-09-10 19:22:06",
+                "2023-09-10 19:22:12"
+            ]
+        ]
+    },
+    {
+        "name": "break",
+        "registerTime": "2023-09-10 17:08:16",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "rest",
+        "registerTime": "2023-09-10 17:08:16",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "sleep",
+        "registerTime": "2023-09-10 17:09:47",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "chores",
+        "registerTime": "2023-09-10 19:23:13",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "electronics",
+        "registerTime": "2023-09-10 19:23:16",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "git",
+        "registerTime": "2023-09-10 19:23:24",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "sysadmin",
+        "registerTime": "2023-09-10 19:23:31",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "trip",
+        "registerTime": "2023-09-10 19:23:38",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "uml",
+        "registerTime": "2023-09-10 19:23:43",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    },
+    {
+        "name": "workout",
+        "registerTime": "2023-09-10 19:23:48",
+        "isRunning": false,
+        "startTime": null,
+        "endTime": null,
+        "timeRanges": null
+    }
 ]
