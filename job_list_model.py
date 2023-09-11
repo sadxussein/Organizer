@@ -10,16 +10,12 @@ class JobListModel(QAbstractListModel):
         super(JobListModel, self).__init__()
         self._data = data or []
         # TODO: consider instance check
-        # if isinstance(data, Job):
-        #     self._data = data or []
-        # else:
-        #     raise ValueError("data in JobListModel constructor is not instance of Job class")
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         if not index.isValid():
             return QVariant()
 
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             return self._data[index.row()].get_job_name()
 
         return QVariant()
@@ -29,7 +25,7 @@ class JobListModel(QAbstractListModel):
             return False
 
         if role == Qt.EditRole:
-            self._data.set_job_name(value)
+            self._data[index.row()].set_job_name(value)
             self.dataChanged.emit(index, index)
             return True
 

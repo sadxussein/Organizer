@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAbstractItemView, QListView, QPushButton, QVBoxLayout, QTableView, \
     QScrollArea, QHBoxLayout, QLabel, QLineEdit, QAction, QMessageBox, QTabWidget, QMenu
 
+from entity_list_view import EntityListView
+from job_list_delegate import JobListDelegate
 from job_list_model import JobListModel
 from task import Task
 from task_list_model import TaskListModel
@@ -16,6 +18,7 @@ from task_list_delegate import TaskListDelegate
 # TODO: create task groups, maybe even tags
 # TODO: try visualize tasks as icons in list view
 # TODO: make one-time tasks subsidiary of tasks
+# TODO: create options class
 
 
 class MainWindow(QMainWindow):
@@ -32,24 +35,13 @@ class MainWindow(QMainWindow):
         self.save_menu_bar_action = QAction("Save", self)
         self.exit_menu_bar_action = QAction("Exit", self)
         self.allow_multiple_tasks_menu_bar_action = QAction("Allow multiple tasks running", self)
-        # context menus
-        self.task_context_menu = QMenu()
-        self.add_task_action = QAction("Add", self)
-        self.delete_task_action = QAction("Delete", self)
-        self.rename_task_action = QAction("Rename", self)
-        self.edit_task_action = QAction("Edit parameters", self)
-        self.job_context_menu = QMenu()
-        self.add_job_action = QAction("Add", self)
-        self.delete_job_action = QAction("Delete", self)
-        self.rename_job_action = QAction("Rename", self)
-        self.edit_job_action = QAction("Edit parameters", self)
         # main widget
         self.central_widget = QWidget(self)
         self.layout = QVBoxLayout()
         # tabs
         self.tab_widget = QTabWidget(self)
         self.task_list_view_widget = QWidget()
-        self.task_list_view = QListView(self.task_list_view_widget)
+        self.task_list_view = EntityListView(self.task_list_view_widget)
         self.task_ordered_view_widget = QWidget()
         self.task_ordered_view = QListView(self.task_ordered_view_widget)
         self.task_graph_view_widget = QWidget()
@@ -64,8 +56,6 @@ class MainWindow(QMainWindow):
         self.task_view_scroll_content = QWidget()
         self.task_view_layout = QVBoxLayout(self.task_view_scroll_content)
         self.task_view_element_pairs = []
-        self.add_task_button = QPushButton("Add task")
-        self.delete_task_button = QPushButton("Delete task")
         self.save_tasks_button = QPushButton("Save tasks")
         # models & loading data from JSON file
         self._tasks = []
@@ -77,6 +67,7 @@ class MainWindow(QMainWindow):
         self._job_list_view_selection_model = None
         # delegates
         self._task_list_delegate = TaskListDelegate()
+        self._job_list_delegate = JobListDelegate()
         # initializing main elements of the window
         self.init_window()
 
@@ -92,30 +83,13 @@ class MainWindow(QMainWindow):
         self.allow_multiple_tasks_menu_bar_action.setCheckable(True)
         self.allow_multiple_tasks_menu_bar_action.setChecked(False)
         self.allow_multiple_tasks_menu_bar_action.triggered.connect(self.on_allow_multiple_tasks_running)
-        # context menu
-        self.task_context_menu.addAction(self.add_task_action)
-        self.task_context_menu.addAction(self.delete_task_action)
-        self.task_context_menu.addAction(self.rename_task_action)
-        self.task_context_menu.addAction(self.edit_task_action)
-        self.add_task_action.triggered.connect(self.on_add_task)
-        self.delete_task_action.triggered.connect(self.on_delete_task)
-        self.rename_task_action.triggered.connect(self.on_rename_task)
-        self.edit_task_action.triggered.connect(self.on_edit_task)
-        self.job_context_menu.addAction(self.add_job_action)
-        self.job_context_menu.addAction(self.delete_job_action)
-        self.job_context_menu.addAction(self.rename_job_action)
-        self.job_context_menu.addAction(self.edit_job_action)
-        self.add_job_action.triggered.connect(self.on_add_job)
-        self.delete_job_action.triggered.connect(self.on_delete_job)
-        self.rename_job_action.triggered.connect(self.on_rename_job)
-        self.edit_job_action.triggered.connect(self.on_edit_job)
         # widget to which other elements are attached to
         self.setCentralWidget(self.central_widget)
         # all tasks in a list/tab
         # task list view
-        self.task_list_view.setSelectionMode(QAbstractItemView.SingleSelection)
+        # self.task_list_view.setSelectionMode(QAbstractItemView.SingleSelection)   # FIXME: is by default single mode?
         self.task_list_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.task_list_view.customContextMenuRequested.connect(lambda event: self.show_task_context_menu(event))
+        self.task_list_view.customContextMenuRequested.connect(lambda event: self.show_context_menu(event, self.task_list_view))
         # self.task_list_view.setDragEnabled(True)  # FIXME: drag n drops necessary?
         # self.task_list_view.setAcceptDrops(True)
         # self.task_list_view.setDropIndicatorShown(True)
@@ -127,8 +101,9 @@ class MainWindow(QMainWindow):
         # TODO: task graph view
         # job list view
         self.job_list_view.setModel(self._job_list_model)
+        self.job_list_view.setItemDelegate(self._job_list_delegate)
         self.job_list_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.job_list_view.customContextMenuRequested.connect(lambda event: self.show_job_context_menu(event))
+        self.job_list_view.customContextMenuRequested.connect(lambda event: self.show_context_menu(event, self.job_list_view))
         self._job_list_view_selection_model = self.job_list_view.selectionModel()
         self._job_list_view_selection_model.selectionChanged.connect(self.on_selection_changed)
         # task detailed view
@@ -146,8 +121,6 @@ class MainWindow(QMainWindow):
         # buttons, names are self-explanatory
         self.start_task_button.clicked.connect(self.on_start_task)
         self.end_task_button.clicked.connect(self.on_end_task)
-        self.add_task_button.clicked.connect(self.on_add_task)
-        self.delete_task_button.clicked.connect(self.on_delete_task)
         self.save_tasks_button.clicked.connect(self.save_json_file)
         # adding elements to tab layout
         self.tab_widget.addTab(self.task_list_view, "Task list")
@@ -159,8 +132,6 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.start_task_button)
         self.layout.addWidget(self.end_task_button)
         self.layout.addWidget(self.task_view_scroll_area)
-        self.layout.addWidget(self.add_task_button)
-        self.layout.addWidget(self.delete_task_button)
         self.layout.addWidget(self.save_tasks_button)
         # applying layout to central widget
         self.central_widget.setLayout(self.layout)
@@ -237,17 +208,24 @@ class MainWindow(QMainWindow):
             self._tasks[self._currently_selected_task].end_task()
             self.update_task_view()
 
-    def on_add_job(self):
-        rows = self._job_list_model.rowCount()
-        self._job_list_model.insertRows(rows, 1)
+    @staticmethod
+    def __on_add_entity(view):
+        rows = view.model().rowCount()
+        view.model().insertRows(rows, 1)
 
-    def on_delete_job(self):
-        pass
+    @staticmethod
+    def __on_delete_entity(view):
+        for index in view.selectionModel().selectedIndexes():
+            view.model().removeRows(index.row(), 1)
 
-    def on_rename_job(self):
-        pass
+    @staticmethod
+    def __on_rename_entity(view):
+        for index in view.selectionModel().selectedIndexes():
+            view.edit(index)
 
-    def on_edit_job(self):
+    # TODO: implement edit window
+    @staticmethod
+    def __on_edit_job(view):
         pass
 
     # updating index of selected task
@@ -267,10 +245,7 @@ class MainWindow(QMainWindow):
             self.update_task_view()
 
     def update_task_view(self):
-        # print(f"Selected item under index {self._currently_selected_task}")   # FIXME: remove debug
         current_task = self._tasks[self._currently_selected_task].get_task("USER")
-        # print(len(current_task))  # FIXME: remove debug
-        # print(current_task)       # FIXME: remove debug
         for i in range(len(current_task)):
             self.task_view_element_pairs[i][1].setText(f"{current_task[i]}")
 
@@ -291,24 +266,30 @@ class MainWindow(QMainWindow):
         error_dialog_box.setStandardButtons(QMessageBox.Ok)
         error_dialog_box.exec_()
 
-    def show_task_context_menu(self, event):
-        self.task_context_menu.exec_(self.task_list_view.mapToGlobal(event))
-
-    def show_job_context_menu(self, event):
+    def show_context_menu(self, event, view):
         context_menu = QMenu()
         add_action = QAction("Add job", self)
         delete_action = QAction("Delete job", self)
         rename_action = QAction("Rename job", self)
         edit_action = QAction("Edit job", self)
-        add_action.triggered.connect(self.on_add_job)
-        delete_action.triggered.connect(self.on_delete_job)
-        rename_action.triggered.connect(self.on_rename_job)
-        edit_action.triggered.connect(self.on_edit_job)
-        if any(self._job_list_view_selection_model.selectedIndexes()):
+
+        add_action.triggered.connect(lambda: self.__on_add_entity(view))
+        delete_action.triggered.connect(lambda: self.__on_delete_entity(view))
+        rename_action.triggered.connect(lambda: self.__on_rename_entity(view))
+        edit_action.triggered.connect(lambda: self.__on_edit_job(view))
+
+        if any(view.selectionModel().selectedIndexes()):
             context_menu.addAction(add_action)
             context_menu.addAction(delete_action)
             context_menu.addAction(rename_action)
             context_menu.addAction(edit_action)
         else:
             context_menu.addAction(add_action)
-        context_menu.exec_(self.job_list_view.mapToGlobal(event))
+
+        context_menu.exec_(view.mapToGlobal(event))
+
+    def on_view_clicked(self, event, view):
+        index = view.indexAt(event.pos())
+        if not index.isValid():
+            view.clearSelection()
+        super(MainWindow, self).mousePressEvent(event)

@@ -1,8 +1,12 @@
+from datetime import datetime
+
+
 class Job:
     def __init__(self, name, end_time=None, parent_task=None):
         self.name = name
         self.end_time = end_time
         self.parent_task = parent_task
+        self.register_date = datetime.now()
 
     def set_job_name(self, name):
         self.name = name
