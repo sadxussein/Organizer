@@ -8,7 +8,6 @@ from main_window import MainWindow
 # GUI
 # TODO: detailed task view
 # TODO: task groups, task tags
-# TODO: jobs (task - onetime, job - repeated)
 # TODO: consider loading not all tasks at once, since it may take too much space and time after and while loading
 
 

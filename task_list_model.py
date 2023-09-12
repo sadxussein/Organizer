@@ -10,10 +10,7 @@ class TaskListModel(QAbstractListModel):
     # default constructor
     def __init__(self, data=None):
         QAbstractListModel.__init__(self)
-        # if data is None replace it with empty list, to safe myself from unnecessary checks
-        # self._data = [task.get_task("NAME") for task in data] or []
         self._data = data or []
-        print(data)
 
     # implementing from parent class
     def rowCount(self, parent: QModelIndex = ...) -> int:
@@ -32,6 +29,8 @@ class TaskListModel(QAbstractListModel):
             return self._data[index.row()].get_task_name()
         elif role == constants.isTaskRunningRole:
             return self._data[index.row()].is_task_running()
+        elif role == constants.getFullDataRole:
+            return self._data
 
         return QVariant()
 
@@ -70,9 +69,13 @@ class TaskListModel(QAbstractListModel):
         self.endRemoveRows()
         return True
 
-    # drag'n'drop flags
-    # def supportedDragActions(self) -> Qt.DropActions:
-    #     return Qt.CopyAction | Qt.MoveAction
-    #
-    # def supportedDropActions(self) -> Qt.DropActions:
-    #     return Qt.CopyAction | Qt.MoveAction
+    def prepare_json_for_model(self, data):
+        for el in data:
+            self._data.append(Task(el["name"], el["registerTime"], el["isRunning"],
+                                   el["startTime"], el["endTime"], el["timeRanges"]))
+
+    def prepare_model_for_json(self):
+        json_export = []
+        for el in self._data:
+            json_export.append(el.serialize())
+        return json_export

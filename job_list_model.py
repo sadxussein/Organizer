@@ -1,4 +1,5 @@
 import typing
+from datetime import datetime
 
 from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, QVariant
 
@@ -26,6 +27,7 @@ class JobListModel(QAbstractListModel):
 
         if role == Qt.EditRole:
             self._data[index.row()].set_job_name(value)
+            print(self._data)
             self.dataChanged.emit(index, index)
             return True
 
@@ -51,3 +53,14 @@ class JobListModel(QAbstractListModel):
             return Qt.ItemIsEnabled
 
         return super(JobListModel, self).flags(index) | Qt.ItemIsEditable
+
+    def prepare_json_for_model(self, data):
+        for el in data:
+            self._data.append(Job(el["name"], el["endTime"], el["parentTask"],
+                                  datetime.strptime(el["registerDate"], "%Y-%m-%d %H:%M:%S")))
+
+    def prepare_model_for_json(self):
+        json_export = []
+        for el in self._data:
+            json_export.append(el.serialize())
+        return json_export

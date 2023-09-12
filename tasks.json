@@ -24,12 +24,16 @@
         "name": "work",
         "registerTime": "2023-09-10 17:08:15",
         "isRunning": false,
-        "startTime": "2023-09-10 19:22:06",
-        "endTime": "2023-09-10 19:22:12",
+        "startTime": "2023-09-12 12:21:29",
+        "endTime": "2023-09-12 12:21:30",
         "timeRanges": [
             [
                 "2023-09-10 19:22:06",
                 "2023-09-10 19:22:12"
+            ],
+            [
+                "2023-09-12 12:21:29",
+                "2023-09-12 12:21:30"
             ]
         ]
     },
@@ -37,20 +41,29 @@
         "name": "break",
         "registerTime": "2023-09-10 17:08:16",
         "isRunning": false,
-        "startTime": null,
-        "endTime": null,
-        "timeRanges": null
+        "startTime": "2023-09-12 12:21:28",
+        "endTime": "2023-09-12 12:21:30",
+        "timeRanges": [
+            [
+                "2023-09-12 12:21:28",
+                "2023-09-12 12:21:30"
+            ]
+        ]
     },
     {
         "name": "rest",
         "registerTime": "2023-09-10 17:08:16",
         "isRunning": false,
-        "startTime": "2023-09-11 20:03:25",
-        "endTime": "2023-09-11 20:03:30",
+        "startTime": "2023-09-12 12:20:05",
+        "endTime": "2023-09-12 12:20:06",
         "timeRanges": [
             [
                 "2023-09-11 20:03:25",
                 "2023-09-11 20:03:30"
+            ],
+            [
+                "2023-09-12 12:20:05",
+                "2023-09-12 12:20:06"
             ]
         ]
     },
@@ -58,17 +71,31 @@
         "name": "sleep",
         "registerTime": "2023-09-10 17:09:47",
         "isRunning": false,
-        "startTime": null,
-        "endTime": null,
-        "timeRanges": null
+        "startTime": "2023-09-12 12:20:03",
+        "endTime": "2023-09-12 12:20:03",
+        "timeRanges": [
+            [
+                "2023-09-12 12:20:03",
+                "2023-09-12 12:20:03"
+            ]
+        ]
     },
     {
         "name": "chores",
         "registerTime": "2023-09-10 19:23:13",
         "isRunning": false,
-        "startTime": null,
-        "endTime": null,
-        "timeRanges": null
+        "startTime": "2023-09-12 12:21:23",
+        "endTime": "2023-09-12 12:21:33",
+        "timeRanges": [
+            [
+                "2023-09-12 12:20:04",
+                "2023-09-12 12:20:05"
+            ],
+            [
+                "2023-09-12 12:21:23",
+                "2023-09-12 12:21:33"
+            ]
+        ]
     },
     {
         "name": "electronics",
@@ -99,17 +126,27 @@
         "name": "sysadmin",
         "registerTime": "2023-09-10 19:23:31",
         "isRunning": false,
-        "startTime": null,
-        "endTime": null,
-        "timeRanges": null
+        "startTime": "2023-09-12 12:20:07",
+        "endTime": "2023-09-12 12:20:07",
+        "timeRanges": [
+            [
+                "2023-09-12 12:20:07",
+                "2023-09-12 12:20:07"
+            ]
+        ]
     },
     {
         "name": "trip",
         "registerTime": "2023-09-10 19:23:38",
         "isRunning": false,
-        "startTime": null,
-        "endTime": null,
-        "timeRanges": null
+        "startTime": "2023-09-12 12:21:31",
+        "endTime": "2023-09-12 12:21:32",
+        "timeRanges": [
+            [
+                "2023-09-12 12:21:31",
+                "2023-09-12 12:21:32"
+            ]
+        ]
     },
     {
         "name": "uml",
@@ -123,12 +160,16 @@
         "name": "workout",
         "registerTime": "2023-09-10 19:23:48",
         "isRunning": false,
-        "startTime": "2023-09-11 20:03:01",
-        "endTime": "2023-09-11 20:03:03",
+        "startTime": "2023-09-12 12:20:08",
+        "endTime": "2023-09-12 12:20:10",
         "timeRanges": [
             [
                 "2023-09-11 20:03:01",
                 "2023-09-11 20:03:03"
+            ],
+            [
+                "2023-09-12 12:20:08",
+                "2023-09-12 12:20:10"
             ]
         ]
     }

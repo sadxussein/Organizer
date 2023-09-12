@@ -95,7 +95,7 @@ class Task:
     def set_task_name(self, name):   # TODO: setter
         self.name = name
 
-    def prepare_task_for_json_export(self):
+    def serialize(self):
         if any(self.timeRanges) and self.endTime is not None:
             time_ranges_json = []
             for timeRange in self.timeRanges:

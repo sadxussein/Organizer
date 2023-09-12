@@ -9,7 +9,7 @@ class JobListDelegate(QStyledItemDelegate):
     def createEditor(self, parent: QWidget, option: 'QStyleOptionViewItem', index: QModelIndex) -> QWidget:
         editor = QLineEdit(parent)
         editor.setFrame(True)
-        editor.setMaxLength(20)
+        editor.setMaxLength(100)
         return editor
 
     def setEditorData(self, editor: QWidget, index: QModelIndex) -> None:
