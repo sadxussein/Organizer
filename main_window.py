@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
         self._currently_selected_entity_index = None
         self._currently_selected_job = None
         self._is_allowed_multiple_tasks_running = False
+        self._is_single_task_running = False    # TODO: initialise this based on loaded json files
         # elements of the window
         self.menu_bar = self.menuBar()
         self.file_menu_bar = self.menu_bar.addMenu("File")
@@ -177,22 +178,26 @@ class MainWindow(QMainWindow):
     def __start_task(self, index):
         if index.isValid():
             if not self._is_allowed_multiple_tasks_running:
-                tasks = self.task_list_view.model().data(index, constants.getFullDataRole)
-                if not any()     # TODO: FINISH
-
-        if index.isValid():
-            if not self._is_allowed_multiple_tasks_running:
-                if self._currently_selected_entity_index is not None and not any([task.is_task_running() for task in self._tasks]):
-                    self._tasks[self._currently_selected_entity_index].start_task()
-                    self.task_list_view.update(index)
-                    # self.update_task_view()
+                is_selected_task_running = self.task_list_view.model().data(index, constants.isTaskRunningRole)
+                if not is_selected_task_running and not self._is_single_task_running:
+                    self.task_list_view.model().setData(index, value=None, role=constants.startTaskRole)
+                    self._is_single_task_running = True
                 else:
                     self.show_error_message()
-            else:
-                if self._currently_selected_entity_index is not None:
-                    self._tasks[self._currently_selected_entity_index].start_task()
-                    self.task_list_view.update(index)
-                    # self.update_task_view()
+
+        # if index.isValid():
+        #     if not self._is_allowed_multiple_tasks_running:
+        #         if self._currently_selected_entity_index is not None and not any([task.is_task_running() for task in self._tasks]):
+        #             self._tasks[self._currently_selected_entity_index].start_task()
+        #             self.task_list_view.update(index)
+        #             # self.update_task_view()
+        #         else:
+        #             self.show_error_message()
+        #     else:
+        #         if self._currently_selected_entity_index is not None:
+        #             self._tasks[self._currently_selected_entity_index].start_task()
+        #             self.task_list_view.update(index)
+        #             # self.update_task_view()
 
     def __end_task(self, index):      # FIXME: only allow when task isRunning == True
         if index.isValid():

@@ -29,8 +29,6 @@ class TaskListModel(QAbstractListModel):
             return self._data[index.row()].get_task_name()
         elif role == constants.isTaskRunningRole:
             return self._data[index.row()].is_task_running()
-        elif role == constants.getFullDataRole:
-            return self._data
 
         return QVariant()
 
@@ -41,6 +39,10 @@ class TaskListModel(QAbstractListModel):
 
         if role == Qt.EditRole:
             self._data[index.row()].set_task_name(value)
+            self.dataChanged.emit(index, index)
+            return True
+        elif role == constants.startTaskRole:
+            self._data[index.row()].start_task()
             self.dataChanged.emit(index, index)
             return True
 
@@ -79,3 +81,6 @@ class TaskListModel(QAbstractListModel):
         for el in self._data:
             json_export.append(el.serialize())
         return json_export
+
+    def get_data(self):
+        return self._data
