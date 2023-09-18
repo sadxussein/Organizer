@@ -15,6 +15,7 @@ from job_list_model import JobListModel
 from task import Task
 from task_list_model import TaskListModel
 from task_list_delegate import TaskListDelegate
+from task_ordered_model import TaskOrderedModel
 
 
 # TODO: connect them with calendar
@@ -24,6 +25,7 @@ from task_list_delegate import TaskListDelegate
 # TODO: make one-time tasks subsidiary of tasks
 # TODO: create options class
 # TODO: create detailed list view for both jobs and tasks
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -52,8 +54,8 @@ class MainWindow(QMainWindow):
         self.task_list_view = EntityListView(self.task_list_view_widget)
         self.task_ordered_view_widget = QWidget()
         self.task_ordered_view = EntityListView(self.task_ordered_view_widget)
-        self.task_graph_view_widget = QWidget()
-        self.task_graph_view = QListView(self.task_graph_view_widget)      # TODO: use proper view for drawing graphs
+        # self.task_graph_view_widget = QWidget()
+        # self.task_graph_view = QListView(self.task_graph_view_widget)      # TODO: use proper view for drawing graphs
         self.job_list_view_widget = QWidget()
         self.job_list_view = EntityListView(self.job_list_view_widget)
         # graph view
@@ -69,11 +71,13 @@ class MainWindow(QMainWindow):
         # models & loading data from JSON file
         self._tasks = []
         self._jobs = []
-        self._task_list_model = TaskListModel(self._tasks)
+        self._task_list_model = TaskListModel(self._tasks)      # TODO: why constructor has argument?
         self._task_list_view_selection_model = None
+        self.__task_ordered_model = TaskOrderedModel()
         self._job_list_model = JobListModel(self._jobs)
         self._job_list_view_selection_model = None
         self.__detailed_entity_model = QStandardItemModel()
+        self.__time_ranges_model = QStandardItemModel()
         # delegates
         self._task_list_delegate = TaskListDelegate()
         self._job_list_delegate = JobListDelegate()
@@ -107,7 +111,8 @@ class MainWindow(QMainWindow):
         self.task_list_view.doubleClicked.connect(lambda index: self.__on_task_switch(index))
         self._task_list_view_selection_model = self.task_list_view.selectionModel()
         self._task_list_view_selection_model.selectionChanged.connect(lambda: self.__on_selection_changed(self.task_list_view))
-        # TODO: task ordered view
+        # task ordered view
+        self.task_ordered_view.setModel(self.__task_ordered_model)
         # TODO: task graph view
         # job list view
         self.job_list_view.setModel(self._job_list_model)
@@ -119,11 +124,13 @@ class MainWindow(QMainWindow):
         # detailed entity view
         self.detailed_entity_view.setEditTriggers(QListView.NoEditTriggers)
         self.detailed_entity_view.setModel(self.__detailed_entity_model)
+        self.time_ranges_view.setEditTriggers(QListView.NoEditTriggers)
+        self.time_ranges_view.setModel(self.__time_ranges_model)
         # save button
         self.save_button.clicked.connect(self.__save_to_files)
         # adding elements to tab layout
         self.tab_widget.addTab(self.task_list_view, "Task list")
-        # self.tab_widget.addTab(self.task_ordered_view, "Ordered task list")  # TODO: consider removal
+        self.tab_widget.addTab(self.task_ordered_view, "Ordered task list")
         # self.tab_widget.addTab(self.task_graph_view, "Task graph")           # TODO: consider removal
         self.tab_widget.addTab(self.job_list_view, "Job list")
         # adding elements to top layout (entity list view and graph view)
@@ -143,7 +150,7 @@ class MainWindow(QMainWindow):
         # applying layout to central widget
         self.central_widget.setLayout(self.layout)
         # window size
-        self.setGeometry(200, 200, 600, 600)
+        self.setGeometry(200, 200, 800, 800)
 
     # opening file and extracting data
     def __open_tasks_json_file(self):
@@ -151,6 +158,7 @@ class MainWindow(QMainWindow):
             json_data = json.load(file)         # store all our tasks which now need to be parsed into simple list
         # import from file into model
         self.task_list_view.model().prepare_json_for_model(json_data)
+        self.task_ordered_view.model().prepare_json_for_model(json_data)
 
     # TODO: saving to file results of program's work
     def __save_tasks_json_file(self):
@@ -191,10 +199,12 @@ class MainWindow(QMainWindow):
 
     def __on_task_switch(self, index):      # double click operator for task list view
         if index.isValid():
-            if self.task_list_view.model().data(index, role=isTaskRunningRole) is False:        # TODO: might be overkill, checking is_running again inside start function
+            # TODO: might be overkill, checking is_running again inside start function
+            if self.task_list_view.model().data(index, role=isTaskRunningRole) is False:
                 self.__start_task(index)
             else:
                 self.__end_task(index)
+            self.__on_selection_changed(self.task_list_view)
 
     @staticmethod
     def __on_add_entity(view):
@@ -221,7 +231,7 @@ class MainWindow(QMainWindow):
         for index in view.selectionModel().selectedIndexes():
             # TODO: passing index, while having protected variable of selected task
             self._currently_selected_entity_index = index
-            self.__update_detailed_entity_view(view, index)
+            self.__update_detailed_entity_views(view, index)
 
     # TODO: need to think about this logic, it might be necessary to save application status of options to prevent
     #   multiple tasks running when it is not allowed after loading
@@ -231,9 +241,10 @@ class MainWindow(QMainWindow):
         else:
             self._is_allowed_multiple_tasks_running = True
 
-    def __update_detailed_entity_view(self, view, index):
+    def __update_detailed_entity_views(self, view, index):  # both detailed view and time ranges view
         if isinstance(view, EntityListView):
             self.__detailed_entity_model.clear()
+            self.__time_ranges_model.clear()
             model = view.model()
             if isinstance(model, TaskListModel):
                 task_data = model.data(index, constants.getSingleEntityRole)
@@ -242,7 +253,7 @@ class MainWindow(QMainWindow):
                     if key == "timeRanges" and value is not None:
                         for el in value:
                             task_item = QStandardItem(f"{key}: {el}")
-                            self.__detailed_entity_model.appendRow(task_item)
+                            self.__time_ranges_model.appendRow(task_item)
                     else:
                         task_item = QStandardItem(f"{key}: {value}")
                         self.__detailed_entity_model.appendRow(task_item)

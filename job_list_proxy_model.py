@@ -15,3 +15,4 @@ class JobListProxyModel(QSortFilterProxyModel):
             data = self.sourceModel().data(index, role=self.filterRole())
 
         return True
+    
