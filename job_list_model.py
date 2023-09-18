@@ -3,6 +3,7 @@ from datetime import datetime
 
 from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, QVariant
 
+import constants
 from job import Job
 
 
@@ -18,6 +19,8 @@ class JobListModel(QAbstractListModel):
 
         if role == Qt.DisplayRole or role == Qt.EditRole:
             return self._data[index.row()].get_job_name()
+        if role == constants.getSingleEntityRole:
+            return self._data[index.row()]
 
         return QVariant()
 

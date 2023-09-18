@@ -29,6 +29,8 @@ class TaskListModel(QAbstractListModel):
             return self._data[index.row()].get_task_name()
         elif role == constants.isTaskRunningRole:
             return self._data[index.row()].is_task_running()
+        elif role == constants.getSingleEntityRole:
+            return self._data[index.row()]
 
         return QVariant()
 
@@ -43,6 +45,10 @@ class TaskListModel(QAbstractListModel):
             return True
         elif role == constants.startTaskRole:
             self._data[index.row()].start_task()
+            self.dataChanged.emit(index, index)
+            return True
+        elif role == constants.endTaskRole:
+            self._data[index.row()].end_task()
             self.dataChanged.emit(index, index)
             return True
 
