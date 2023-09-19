@@ -15,6 +15,8 @@ class JobListDelegate(QStyledItemDelegate):
     def setEditorData(self, editor: QWidget, index: QModelIndex) -> None:
         assert isinstance(editor, QLineEdit)
         value = index.model().data(index, Qt.EditRole)
+        if value is None:
+            value = "Please enter job name..."
         editor.setText(value)
 
     def setModelData(self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex) -> None:

@@ -22,9 +22,7 @@ class TaskOrderedModel(QAbstractListModel):
         return len(self.__data)
 
     def prepare_json_for_model(self, json_data):
-        print(json_data)
         for task in json_data:
             if task["timeRanges"] is not None:
                 for time_range in task["timeRanges"]:
-                    print(time_range)
                     self.__data.append(time_range)

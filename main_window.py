@@ -1,18 +1,19 @@
 import json
 
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMainWindow, QWidget, QListView, QPushButton, QVBoxLayout, \
-    QScrollArea, QHBoxLayout, QLabel, QLineEdit, QAction, QMessageBox, QTabWidget, QMenu
+    QScrollArea, QHBoxLayout, QLabel, QLineEdit, QAction, QMessageBox, QTabWidget, QMenu, QTableView
 
 import constants
 from constants import isTaskRunningRole
+from date_category_widget import DateCategoryWidget
 from entity_list_view import EntityListView
 from graph_widget import GraphWidget
-from job import Job
 from job_list_delegate import JobListDelegate
-from job_list_model import JobListModel
-from task import Task
+from jobs_model import JobsModel
+from jobs_proxy_model import JobsProxyModel
 from task_list_model import TaskListModel
 from task_list_delegate import TaskListDelegate
 from task_ordered_model import TaskOrderedModel
@@ -25,7 +26,9 @@ from task_ordered_model import TaskOrderedModel
 # TODO: make one-time tasks subsidiary of tasks
 # TODO: create options class
 # TODO: create detailed list view for both jobs and tasks
-
+# TODO: proxy models
+# TODO: add timestamps to jobs, add finished/running jobs
+# TODO: connect jobs and tasks, count task time while running jobs
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -74,10 +77,11 @@ class MainWindow(QMainWindow):
         self._task_list_model = TaskListModel(self._tasks)      # TODO: why constructor has argument?
         self._task_list_view_selection_model = None
         self.__task_ordered_model = TaskOrderedModel()
-        self._job_list_model = JobListModel(self._jobs)
+        self._jobs_model = JobsModel(self._jobs)
         self._job_list_view_selection_model = None
         self.__detailed_entity_model = QStandardItemModel()
         self.__time_ranges_model = QStandardItemModel()
+        self.__job_register_dates_proxy_model = JobsProxyModel(self._jobs_model)
         # delegates
         self._task_list_delegate = TaskListDelegate()
         self._job_list_delegate = JobListDelegate()
@@ -115,7 +119,7 @@ class MainWindow(QMainWindow):
         self.task_ordered_view.setModel(self.__task_ordered_model)
         # TODO: task graph view
         # job list view
-        self.job_list_view.setModel(self._job_list_model)
+        self.job_list_view.setModel(self._jobs_model)
         self.job_list_view.setItemDelegate(self._job_list_delegate)
         self.job_list_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.job_list_view.customContextMenuRequested.connect(lambda event: self.show_context_menu(event, self.job_list_view))
@@ -128,7 +132,8 @@ class MainWindow(QMainWindow):
         self.time_ranges_view.setModel(self.__time_ranges_model)
         # save button
         self.save_button.clicked.connect(self.__save_to_files)
-        # adding elements to tab layout
+        # adding elements to tab layout and event handling
+        self.tab_widget.currentChanged.connect(lambda index: self.__on_tab_changed(index))
         self.tab_widget.addTab(self.task_list_view, "Task list")
         self.tab_widget.addTab(self.task_ordered_view, "Ordered task list")
         # self.tab_widget.addTab(self.task_graph_view, "Task graph")           # TODO: consider removal
@@ -257,12 +262,17 @@ class MainWindow(QMainWindow):
                     else:
                         task_item = QStandardItem(f"{key}: {value}")
                         self.__detailed_entity_model.appendRow(task_item)
-            elif isinstance(model, JobListModel):
+            elif isinstance(model, JobsModel):
                 job_data = model.data(index, constants.getSingleEntityRole)
                 job_data = job_data.serialize()
                 for key, value in job_data.items():
                     job_item = QStandardItem(f"{key}: {value}")
                     self.__detailed_entity_model.appendRow(job_item)
+
+    def __update_time_ranges(self):
+        proxy_model = JobsProxyModel()
+        proxy_model.setSourceModel(self._jobs_model)
+        self.time_ranges_view.setModel(JobsProxyModel)
 
     def show_error_message(self):
         error_dialog_box = QMessageBox(self)
@@ -294,3 +304,9 @@ class MainWindow(QMainWindow):
             context_menu.addAction(add_action)
 
         context_menu.exec_(view.mapToGlobal(event))
+
+    def __on_tab_changed(self, index):
+        if index == 0:
+            self.time_ranges_view.setModel(self.__time_ranges_model)
+        elif index == 2:
+            self.time_ranges_view.setModel(self.__job_register_dates_proxy_model)

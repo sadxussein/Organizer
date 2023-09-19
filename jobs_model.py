@@ -7,20 +7,26 @@ import constants
 from job import Job
 
 
-class JobListModel(QAbstractListModel):
+class JobsModel(QAbstractListModel):
     def __init__(self, data=None):
-        super(JobListModel, self).__init__()
-        self._data = data or []
+        super(JobsModel, self).__init__()
+        self.__data = data or []
+        self.headers = ["name", "registerDate", "parentTask", "endTime"]        # TODO: consider removal
         # TODO: consider instance check
 
     def data(self, index: QModelIndex, role: int = ...) -> typing.Any:
         if not index.isValid():
             return QVariant()
 
+        row = index.row()
+
         if role == Qt.DisplayRole or role == Qt.EditRole:
-            return self._data[index.row()].get_job_name()
-        if role == constants.getSingleEntityRole:
-            return self._data[index.row()]
+            if self.__data is not None:
+                return self.__data[row].get_job_name()
+        elif role == constants.getSingleEntityRole:
+            return self.__data[row]
+        elif role == constants.getJobRegisterDateRole:
+            return self.__data[row].get_job_register_date()
 
         return QVariant()
 
@@ -28,26 +34,28 @@ class JobListModel(QAbstractListModel):
         if not index.isValid():
             return False
 
+        row = index.row()
+
         if role == Qt.EditRole:
-            self._data[index.row()].set_job_name(value)
-            print(self._data)
+            self.__data[row].set_job_name(value)
             self.dataChanged.emit(index, index)
             return True
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
-        return len(self._data)
+        return len(self.__data)
 
     def insertRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
+        # TODO: force user to name job after creating
         self.beginInsertRows(QModelIndex(), row, row + count - 1)
         for _ in range(count):
-            self._data.insert(row, Job("No name job"))
+            self.__data.insert(row, Job(""))
         self.endInsertRows()
         return True
 
     def removeRows(self, row: int, count: int, parent: QModelIndex = ...) -> bool:
         self.beginRemoveRows(QModelIndex(), row, row + count - 1)
         for _ in range(count):
-            del self._data[row]
+            del self.__data[row]
         self.endRemoveRows()
         return True
 
@@ -55,15 +63,14 @@ class JobListModel(QAbstractListModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
 
-        return super(JobListModel, self).flags(index) | Qt.ItemIsEditable
+        return super(JobsModel, self).flags(index) | Qt.ItemIsEditable
 
-    def prepare_json_for_model(self, data):
-        for el in data:
-            self._data.append(Job(el["name"], el["endTime"], el["parentTask"],
-                                  datetime.strptime(el["registerDate"], "%Y-%m-%d %H:%M:%S")))
+    def prepare_json_for_model(self, jobs):     # when opening file or starting application
+        for job in jobs:
+            self.__data.append(Job(job["name"], job["endTime"], job["parentTask"], job["registerDate"]))
 
-    def prepare_model_for_json(self):
+    def prepare_model_for_json(self):       # when saving file TODO: implement saving on closing
         json_export = []
-        for el in self._data:
-            json_export.append(el.serialize())
+        for job in self.__data:
+            json_export.append(job.serialize())
         return json_export

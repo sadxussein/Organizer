@@ -29,10 +29,10 @@ class Job:
     def get_job_parent_task(self):
         return self.__parent_task
 
-    def set_register_date(self, register_date):
+    def set_job_register_date(self, register_date):
         self.__register_date = register_date
 
-    def get_register_date(self):
+    def get_job_register_date(self):
         return self.__register_date
 
     def serialize(self):
@@ -40,5 +40,5 @@ class Job:
             "name": self.__name,
             "endTime": self.__end_time,
             "parentTask": self.__parent_task,
-            "registerDate": self.__register_date.strftime("%Y-%m-%d %H:%M:%S")
+            "registerDate": self.__register_date
         }
